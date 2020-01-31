@@ -72,7 +72,7 @@ class DenStream:
 
         #X = check_array(X, dtype=np.float64, order="C")
 
-        n_samples, _ = X.shape
+        n_samples, _ = np.shape(X)
 
         sample_weight = self._validate_sample_weight(sample_weight, n_samples)
 
@@ -109,7 +109,7 @@ class DenStream:
 
         #X = check_array(X, dtype=np.float64, order="C")
 
-        n_samples, _ = X.shape
+        n_samples, _ = np.shape(X)
 
         sample_weight = self._validate_sample_weight(sample_weight, n_samples)
 
@@ -125,8 +125,13 @@ class DenStream:
         p_micro_cluster_centers = np.array([p_micro_cluster.center() for
                                             p_micro_cluster in
                                             self.p_micro_clusters])
+
+        if len(p_micro_cluster_centers) == 0:
+            return [-1]
+
         p_micro_cluster_weights = [p_micro_cluster.weight() for p_micro_cluster in
                                    self.p_micro_clusters]
+
         dbscan = DBSCAN(eps=0.3, algorithm='brute')
         dbscan.fit(p_micro_cluster_centers,
                    sample_weight=p_micro_cluster_weights)
@@ -211,11 +216,3 @@ class DenStream:
         if sample_weight.shape[0] != n_samples:
             raise ValueError("Shapes of X and sample_weight do not match.")
         return sample_weight
-
-
-#data = np.random.random([1000, 5]) * 1000
-#clusterer = DenStream(lambd=0.1, eps=100, beta=0.5, mu=3)
-# for row in data:
-    #clusterer.partial_fit([row], 1)
-    #print(f"Number of p_micro_clusters is {len(clusterer.p_micro_clusters)}")
-    #print(f"Number of o_micro_clusters is {len(clusterer.o_micro_clusters)}")
